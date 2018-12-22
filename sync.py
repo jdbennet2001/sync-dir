@@ -1,10 +1,13 @@
 from sys import argv
 from os  import scandir
 from os import path
+from os import remove
+from pathlib import Path
 from shutil import copyfile
 
-source: str = '/Volumes/Passport/comics'
-target: str = '/Volumes/Public/webbox'
+source: str = '/Volumes/Passport/comics/on-deck'
+# target: str = '/Volumes/Public/webbox'
+target: str = '/Volumes/Passport/tmp-ondeck'
 
 print( 'Mapping ' , source,  ' to ' , target )
 
@@ -43,6 +46,26 @@ def diffLists(list1, list2):
     diff = [aa for aa in list1 if aa not in list2]
     return diff
 
+def insert(file):
+    source_archive: str = source + file
+    target_archive: str = target + file
+
+    #Generate the parent directory, if missing
+    Path(target_archive).parent.mkdir(parents=True, exist_ok=True);
+
+    #Copy...
+    print('-- > ', file)
+    copyfile(source_archive, target_archive)
+    print('.. copied')
+
+def remove(file):
+    target_archive: str = target + file
+
+    print('< -- ', target_archive)
+    remove(target_archive)
+    print('.. removed.')
+
+
 source_files = scan(source)
 source_files = list(filter(filterArchives, source_files))
 source_relative = [chompLeft(p, source) for p in source_files]
@@ -54,12 +77,18 @@ target_relative = [chompLeft(p, target) for p in target_files]
 print( len(source_files), ' source files scanned, ', len(target_files), ' target files scanned.')
 
 
-delta = diffLists(source_relative, target_relative)
+inserts = diffLists(source_relative, target_relative)
+deletes = diffLists(target_relative, source_relative)
 
-for datum in delta:
-    print('-- > ', datum)
+print('Removing ', len(deletes))
+for datum in deletes:
+    remove(datum)
 
-print( 'delta..', len(delta), ' potential inserts')
+print('Copying ', len(deletes))
+for datum in inserts:
+    insert(datum)
+
+print( 'Done!')
 
 
 
