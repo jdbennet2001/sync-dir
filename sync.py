@@ -1,9 +1,9 @@
 from sys import argv
-from os  import scandir
-from os import path
-from os import remove
+from os      import scandir
+from os      import path
+from os      import remove
 from pathlib import Path
-from shutil import copyfile
+from shutil  import copyfile
 
 source: str = '/Volumes/Passport/comics/on-deck'
 # target: str = '/Volumes/Public/webbox'
@@ -58,7 +58,7 @@ def insert(file):
     copyfile(source_archive, target_archive)
     print('.. copied')
 
-def remove(file):
+def delete(file):
     target_archive: str = target + file
 
     print('< -- ', target_archive)
@@ -82,9 +82,9 @@ deletes = diffLists(target_relative, source_relative)
 
 print('Removing ', len(deletes))
 for datum in deletes:
-    remove(datum)
+    delete(datum)
 
-print('Copying ', len(deletes))
+print('Copying ', len(inserts))
 for datum in inserts:
     insert(datum)
 
